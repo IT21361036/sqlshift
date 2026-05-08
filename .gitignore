@@ -16,6 +16,7 @@ data/*.db
 
 # Worktrees
 .worktrees/
+worktrees/
 
 # JDeveloper artifacts in datasets
 datasets/**/*.lck
