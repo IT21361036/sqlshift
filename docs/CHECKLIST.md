@@ -26,7 +26,11 @@
 
 ## Git / Deployment
 
-- [x] Feature branch `feat/implementation` (16 commits)
+- [x] Feature branch `feat/implementation` (19 commits)
+- [x] Tracking docs created (MEMORY, CONVERSATION_SUMMARY, CHECKLIST, ERROR_CHANGELOG)
+- [x] E-011 fixed — missing `Session` import in orchestrator.py
+- [x] E-012 fixed — Dockerfile CMD auto-runs `init_db` before uvicorn
+- [x] Container running at `http://localhost:8000` (Swagger UI at `/docs`)
 - [ ] Push to `https://github.com/IT21361036/sqlshift`
 - [ ] Open PR: `feat/implementation` → `main`
 - [ ] Merge to main
