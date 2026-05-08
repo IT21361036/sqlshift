@@ -8,7 +8,7 @@ from db.database import Base
 class Job(Base):
     __tablename__ = "jobs"
     id = Column(Text, primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     status = Column(Text, default="pending")
     source_dialect = Column(Text, nullable=False)
     target_dialect = Column(Text, nullable=False)
@@ -50,4 +50,4 @@ class Cache(Base):
     target_dialect = Column(Text, primary_key=True)
     modernized_sql = Column(Text, nullable=False)
     quality_score = Column(Integer, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))

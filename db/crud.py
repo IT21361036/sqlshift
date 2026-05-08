@@ -21,6 +21,8 @@ def create_job(db: Session, source_dialect: str, target_dialect: str, input_sql:
 
 def update_job_status(db: Session, job_id: str, status: str, quality_avg: float = None):
     job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        return
     job.status = status
     if quality_avg is not None:
         job.quality_avg = quality_avg
@@ -29,6 +31,8 @@ def update_job_status(db: Session, job_id: str, status: str, quality_avg: float 
 
 def increment_done_count(db: Session, job_id: str):
     job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        return
     job.done_count += 1
     db.commit()
 
@@ -117,5 +121,8 @@ def check_cache(db: Session, input_hash: str, target_dialect: str) -> Cache:
 
 
 def write_cache(db: Session, input_hash: str, target_dialect: str, modernized_sql: str, quality_score: int):
+    existing = check_cache(db, input_hash, target_dialect)
+    if existing:
+        return
     db.add(Cache(input_hash=input_hash, target_dialect=target_dialect, modernized_sql=modernized_sql, quality_score=quality_score))
     db.commit()
