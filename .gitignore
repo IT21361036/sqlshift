@@ -1,0 +1,27 @@
+# Python
+.env
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+dist/
+*.egg-info/
+
+# SQLite runtime DB
+data/*.db
+
+# Worktrees
+.worktrees/
+
+# JDeveloper artifacts in datasets
+datasets/**/*.lck
+datasets/**/*.jdb
+datasets/**/classes/
+
+# OS
+.DS_Store
+Thumbs.db
