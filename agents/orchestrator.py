@@ -1,4 +1,5 @@
 import time
+from sqlalchemy.orm import Session
 from agents import translator, validator, optimizer
 from pipeline import ingestion, report
 from db import crud

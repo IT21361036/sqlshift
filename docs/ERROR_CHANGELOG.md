@@ -154,3 +154,17 @@ class ModernizeRequest(BaseModel):
     target_dialect: SUPPORTED_DIALECTS = "postgresql"
 ```
 **Lesson:** Any string that reaches an LLM prompt must be validated. Dialect fields are attack surface.
+
+---
+
+## E-011 — `NameError: Session is not defined` in orchestrator.py at container startup
+
+**When:** Task 11, docker build smoke test
+**Symptom:** Container crashed immediately with `NameError: name 'Session' is not defined` in `agents/orchestrator.py:27`
+**Root cause:** When the fix subagent (E-009) changed `run_job` to accept a `session_factory` instead of a live `Session`, it left the `db: Session` type hint on the internal `_process_statement` helper — but never added `from sqlalchemy.orm import Session` to the imports. The missing import was invisible to pytest (tests mock the whole function) but crashed at runtime when uvicorn imported the module.
+**Fix:**
+```python
+# Added to agents/orchestrator.py imports
+from sqlalchemy.orm import Session
+```
+**Lesson:** Type-hint-only imports are not caught by mocked tests. Always do a real container smoke test (`docker run` + `curl /health`) before merging — it imports every module for real.

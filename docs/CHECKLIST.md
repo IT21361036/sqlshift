@@ -21,8 +21,8 @@
 - [x] All LLM calls mocked in tests
 - [x] Spec compliance review passed for each task
 - [x] Code quality review passed for each task
-- [ ] `docker build` local verification
-- [ ] Live `docker-compose up` smoke test
+- [x] `docker build` local verification
+- [x] Live `docker run` smoke test (`GET /health` → `{"status":"ok"}`)
 
 ## Git / Deployment
 
