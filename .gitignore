@@ -18,11 +18,6 @@ data/*.db
 .worktrees/
 worktrees/
 
-# JDeveloper artifacts in datasets
-datasets/**/*.lck
-datasets/**/*.jdb
-datasets/**/classes/
-
 # OS
 .DS_Store
 Thumbs.db
