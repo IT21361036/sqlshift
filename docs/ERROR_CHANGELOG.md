@@ -168,3 +168,20 @@ class ModernizeRequest(BaseModel):
 from sqlalchemy.orm import Session
 ```
 **Lesson:** Type-hint-only imports are not caught by mocked tests. Always do a real container smoke test (`docker run` + `curl /health`) before merging — it imports every module for real.
+
+---
+
+## E-012 — `/history` returned 500 on first container run
+
+**When:** Session 3, container smoke test after E-011 fix
+**Symptom:** `GET /history` → `{"detail":"Internal server error"}` — DB tables didn't exist
+**Root cause:** Dockerfile `CMD` only ran uvicorn. The SQLite database file and tables are created by `manage.py init_db`, which was never called inside the container. The global exception handler (added in E-010 fix) correctly swallowed the `OperationalError` but returned a 500.
+**Fix:** Changed Dockerfile CMD to run init_db first:
+```dockerfile
+# Before
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# After
+CMD ["sh", "-c", "python manage.py init_db && uvicorn api.main:app --host 0.0.0.0 --port 8000"]
+```
+**Lesson:** Containerised apps need an entrypoint that handles first-run setup. Either bake it into CMD, use an entrypoint script, or use a startup event in FastAPI (`@app.on_event("startup")`).

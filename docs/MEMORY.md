@@ -79,6 +79,23 @@ Ollama uses the OpenAI-compatible API, so the standard `openai` SDK works with `
 
 ---
 
+## Docker
+
+- Image: `sqlshift` built from `python:3.11-slim`
+- CMD auto-runs `python manage.py init_db` before starting uvicorn — no manual setup needed
+- Run locally: `docker run -d --name sqlshift -p 8000:8000 -e DATABASE_URL=sqlite:///./data/sqlshift.db sqlshift`
+- Swagger UI available at `http://localhost:8000/docs` once running
+- For production: pass Supabase connection string as `DATABASE_URL` — no code changes needed
+
+## Supabase (Production DB — not yet configured)
+
+Supabase URL and credentials not provided yet. When ready:
+1. Create project at supabase.com
+2. Copy connection string: `postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres`
+3. Set as `DATABASE_URL` env var — SQLAlchemy switches automatically
+
+---
+
 ## Git Workflow
 
 - All development on `feat/implementation`

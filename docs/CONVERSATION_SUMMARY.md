@@ -39,7 +39,24 @@
 
 **Final state:** 40/40 tests passing. 16 commits on `feat/implementation`.
 
+---
+
+## Session 3 — 2026-05-09 (Docker verification + tracking docs)
+
+**What happened:**
+
+- Created project tracking docs: `docs/MEMORY.md`, `docs/CONVERSATION_SUMMARY.md`, `docs/CHECKLIST.md`, `docs/ERROR_CHANGELOG.md`
+- Ran `docker build -t sqlshift .` — succeeded first time (image built in ~90s)
+- Container smoke test failed: `NameError: Session is not defined` in `agents/orchestrator.py` (E-011)
+  - Root cause: `from sqlalchemy.orm import Session` was missing after the E-009 fix refactor
+  - Fix: added the import, rebuilt image
+- Second smoke test: `docker run` + `curl /health` → `{"status":"ok"}` ✓
+- `/history` returned 500 — DB not initialized inside container (E-012)
+  - Fix: changed Dockerfile CMD to auto-run `python manage.py init_db` before uvicorn
+- Container now running at `http://localhost:8000` with Swagger UI at `/docs`
+- Confirmed Supabase not needed yet — SQLite fine for local/demo use
+
 ### Pending
-- [ ] `docker build` local verification (Task 11 Step 7 — skipped)
-- [ ] Decide on frontend (currently none)
+- [ ] Decide on frontend (simple HTML/JS vs React vs skip)
 - [ ] Push branch + open PR → merge to main
+- [ ] Supabase project URL (when ready for production)
