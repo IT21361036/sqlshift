@@ -1,24 +1,27 @@
 import time
-from sqlalchemy.orm import Session
 from agents import translator, validator, optimizer
 from pipeline import ingestion, report
 from db import crud
 from config import MAX_RETRIES
 
 
-def run_job(db: Session, job_id: str, raw_sql: str, source_dialect: str, target_dialect: str) -> dict:
-    crud.update_job_status(db, job_id, "running")
-    statements = ingestion.parse_sql(raw_sql)
-    results = []
+def run_job(session_factory, job_id: str, raw_sql: str, source_dialect: str, target_dialect: str) -> dict:
+    db = session_factory()
+    try:
+        crud.update_job_status(db, job_id, "running")
+        statements = ingestion.parse_sql(raw_sql)
+        results = []
 
-    for i, stmt in enumerate(statements, start=1):
-        result = _process_statement(db, stmt, source_dialect, target_dialect, job_id, i)
-        results.append(result)
-        crud.increment_done_count(db, job_id)
+        for i, stmt in enumerate(statements, start=1):
+            result = _process_statement(db, stmt, source_dialect, target_dialect, job_id, i)
+            results.append(result)
+            crud.increment_done_count(db, job_id)
 
-    rep = report.build_report(job_id, results)
-    crud.update_job_status(db, job_id, "done", quality_avg=rep["quality_avg"])
-    return rep
+        rep = report.build_report(job_id, results)
+        crud.update_job_status(db, job_id, "done", quality_avg=rep["quality_avg"])
+        return rep
+    finally:
+        db.close()
 
 
 def _process_statement(db: Session, stmt: str, source_dialect: str, target_dialect: str, job_id: str, position: int) -> dict:

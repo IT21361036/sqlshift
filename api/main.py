@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from api.models import (
@@ -15,10 +16,16 @@ from api.models import (
 )
 from api.dependencies import get_db
 from db import crud
+from db.database import SessionLocal
 from agents import orchestrator
 from pipeline import ingestion
 
 app = FastAPI(title="SQLShift", version="1.0.0")
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -32,7 +39,7 @@ def modernize(req: ModernizeRequest, background_tasks: BackgroundTasks, db: Sess
     job = crud.create_job(db, req.source_dialect, req.target_dialect, req.sql, len(statements))
     background_tasks.add_task(
         orchestrator.run_job,
-        db,
+        SessionLocal,
         job.id,
         req.sql,
         req.source_dialect,

@@ -1,12 +1,14 @@
 from __future__ import annotations
-from typing import Optional
-from pydantic import BaseModel
+from typing import Optional, Literal
+from pydantic import BaseModel, Field
+
+SUPPORTED_DIALECTS = Literal["tsql", "mysql", "oracle", "postgresql", "sqlite"]
 
 
 class ModernizeRequest(BaseModel):
-    sql: str
-    source_dialect: str = "tsql"
-    target_dialect: str = "postgresql"
+    sql: str = Field(..., min_length=1, max_length=524288)  # 512 KB ceiling
+    source_dialect: SUPPORTED_DIALECTS = "tsql"
+    target_dialect: SUPPORTED_DIALECTS = "postgresql"
 
 
 class ModernizeResponse(BaseModel):
