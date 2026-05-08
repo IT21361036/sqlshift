@@ -1,0 +1,11 @@
+openai>=1.30.0
+python-dotenv
+sqlparse
+sqlalchemy
+psycopg2-binary
+fastapi
+uvicorn[standard]
+pydantic>=2.0
+pytest
+pytest-asyncio
+httpx
