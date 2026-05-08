@@ -1,10 +1,8 @@
 import os
 import sqlparse
 import sqlparse.tokens as T
-from openai import AzureOpenAI
-from config import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT
+from agents.llm_client import call_qwen
 
-_client = None
 _PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "validator.txt")
 
 _DEPRECATED_TOKENS = {
@@ -12,17 +10,6 @@ _DEPRECATED_TOKENS = {
     "ansi": ["ROWNUM", "NOLOCK", "(+)", "@@FETCH_STATUS"],
     "mysql8": ["ROWNUM", "(+)"],
 }
-
-
-def _get_client() -> AzureOpenAI:
-    global _client
-    if _client is None:
-        _client = AzureOpenAI(
-            azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version="2024-02-01",
-        )
-    return _client
 
 
 def validate(original: str, translated: str, source_dialect: str, target_dialect: str) -> dict:
@@ -77,6 +64,10 @@ def _had_where(sql: str) -> bool:
 
 def _column_count_mismatch(original: str, translated: str) -> bool:
     def _count_cols(sql: str) -> int:
+        stripped = sql.strip().upper()
+        # Skip SELECT * — column count is indeterminate
+        if "SELECT *" in stripped or "SELECT\n*" in stripped:
+            return 0
         parsed = sqlparse.parse(sql)
         if not parsed:
             return 0
@@ -104,12 +95,7 @@ def _gpt_equivalence(original: str, translated: str, source_dialect: str, target
             translated_sql=translated,
         )
     try:
-        response = _get_client().chat.completions.create(
-            model=AZURE_OPENAI_DEPLOYMENT,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=10,
-        )
-        return float(response.choices[0].message.content.strip())
+        result = call_qwen("", prompt)
+        return float(result.strip())
     except Exception:
-        return 1.0
+        return 0.8  # neutral default — neither rewards nor penalizes API failures
