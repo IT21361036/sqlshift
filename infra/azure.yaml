@@ -1,0 +1,6 @@
+name: sqlshift
+services:
+  app:
+    project: .
+    language: py
+    host: containerapp
