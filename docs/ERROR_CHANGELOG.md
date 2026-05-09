@@ -185,3 +185,26 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 CMD ["sh", "-c", "python manage.py init_db && uvicorn api.main:app --host 0.0.0.0 --port 8000"]
 ```
 **Lesson:** Containerised apps need an entrypoint that handles first-run setup. Either bake it into CMD, use an entrypoint script, or use a startup event in FastAPI (`@app.on_event("startup")`).
+
+---
+
+## E-013 — GitHub push blocked: PAT exposed in ERROR_CHANGELOG.md
+
+**When:** Session 3, pushing `feat/implementation` to GitHub
+**Symptom:** `GH013: Repository rule violations found — Push cannot contain secrets` — push rejected by GitHub push protection
+**Root cause:** `docs/ERROR_CHANGELOG.md` entry E-002 included a literal PAT string (the rejected token from saarakaizerr). GitHub's secret scanning detected it across 3 commits.
+**Fix:**
+1. Redacted the PAT string to `[REDACTED]` in the file
+2. Rewrote all affected commits using `git filter-branch --tree-filter` to scrub the string from history
+3. Force-pushed the rewritten branch with `--force-with-lease`
+**Lesson:** Never write raw credential strings in documentation files — even invalid/revoked ones. Use `[REDACTED]` or describe the token format without including the value.
+
+---
+
+## E-014 — Push rejected: PAT missing `workflow` scope
+
+**When:** Session 3, immediately after E-013 fix
+**Symptom:** `refusing to allow a Personal Access Token to create or update workflow files without workflow scope`
+**Root cause:** The PAT used for pushing had only `repo` scope. GitHub requires the `workflow` scope specifically to push changes to `.github/workflows/` files.
+**Fix:** User generated a new PAT with both `repo` and `workflow` scopes.
+**Lesson:** Always include `workflow` scope in PATs for repos that contain GitHub Actions workflows.

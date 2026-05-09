@@ -31,8 +31,8 @@
 - [x] E-011 fixed — missing `Session` import in orchestrator.py
 - [x] E-012 fixed — Dockerfile CMD auto-runs `init_db` before uvicorn
 - [x] Container running at `http://localhost:8000` (Swagger UI at `/docs`)
-- [ ] Push to `https://github.com/IT21361036/sqlshift`
-- [ ] Open PR: `feat/implementation` → `main`
+- [x] Push to `https://github.com/IT21361036/sqlshift`
+- [x] Open PR: `feat/implementation` → `main` ([PR #4](https://github.com/IT21361036/sqlshift/pull/4))
 - [ ] Merge to main
 - [ ] (Optional) Azure Container Apps deployment
 - [ ] (Optional) Supabase PostgreSQL production DB wired up
