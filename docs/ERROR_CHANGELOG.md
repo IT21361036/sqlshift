@@ -21,7 +21,7 @@ git remote set-url origin https://IT21361036:<PAT>@github.com/IT21361036/sqlshif
 
 **When:** Session 1, immediately after E-001
 **Symptom:** `remote: Invalid username or password`
-**Root cause:** PAT `[REDACTED]` was generated from the wrong GitHub account (`saarakaizerr`).
+**Root cause:** PAT was generated from the wrong GitHub account (`saarakaizerr`).
 **Fix:** User generated a new PAT from the correct account (`IT21361036`) with `repo` scope.
 **Lesson:** Always verify which GitHub account you're logged into before generating a PAT.
 
